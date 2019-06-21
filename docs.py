@@ -1,7 +1,7 @@
 import asyncio
 import json
-import time
 import os
+import time
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
@@ -72,7 +72,7 @@ async def daily_stats(output):
         resources = await transifex.resources()
         stats = await transifex.stats(resources)
 
-    today = datetime.now().strftime("%Y_%m_%d")
+    today = datetime.now().strftime("%Y-%m-%d")
     filename = output / f"{today}.json"
 
     with open(filename, mode="w") as file:
@@ -87,7 +87,7 @@ def run_daily_stats():
 
 
 def main():
-    job = schedule.every().day.do(run_daily_stats)
+    job = schedule.every().day.at("00:00").do(run_daily_stats)
     job.run()
     while True:
         schedule.run_pending()
