@@ -11,6 +11,7 @@ python-decouple = "^3.1"
 aiohttp = "^3.5"
 schedule = "^0.6.0"
 loguru = "^0.2.5"
+aiogram = "^2.2"
 
 [tool.poetry.dev-dependencies]
 ipython = "^7.5"
