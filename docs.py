@@ -180,15 +180,14 @@ async def report():
         "BROADCAST_REPORT_TO", cast=lambda v: [s.strip() for s in v.split(",")]
     )
 
-    await asyncio.gather(*[
-        bot.send_message(user, message, parse_mode="Markdown")
-        for user in users
-    ])
+    await asyncio.gather(
+        *[bot.send_message(user, message, parse_mode="Markdown") for user in users]
+    )
 
 
 def main():
     schedule.every().sunday.at("18:00").do(asyncio.run(report()))
-    schedule.every().day.at("00:00").do(run_daily_stats).run()
+    schedule.every().day.at("23:59").do(run_daily_stats).run()
     while True:
         schedule.run_pending()
         time.sleep(1)
