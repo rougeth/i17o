@@ -16,9 +16,7 @@ from aiogram import Bot
 
 
 STATS_FIELDS = [
-    "completed",
     "reviewed",
-    "reviewed_percentage",
     "translated_entities",
     "translated_words",
     "untranslated_entities",
@@ -60,13 +58,9 @@ class Transifex:
         )
 
         stats = defaultdict(lambda: {field: 0 for field in STATS_FIELDS})
-        for resource, stat in response:
-            # Group stats considering the first part of slug.
-            # Transform "c-api--abstract" and "c-api--allocation" into "c-api".
-            # resource = resource.split('--')[0]
 
-            for field in STATS_FIELDS:
-                stats[resource][field] += stat[field]
+        for resource, stat in response:
+            stats[resource] = stat
 
         stats["glossary"] = stats.pop("glossary_")
         return {key: stats[key] for key in sorted(stats.keys(), reverse=True)}
