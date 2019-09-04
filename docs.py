@@ -26,8 +26,8 @@ STATS_FIELDS = [
 ]
 
 STATS_MESSAGES = {
-    "reviewed": "- Traduções revisadas: +{}\n",
-    "translated_words": "- Palavras traduzidas: +{}\n",
+    "reviewed": "- Traduções revisadas: {:+}\n",
+    "translated_words": "- Palavras traduzidas: {:+}\n",
 }
 
 
@@ -65,15 +65,19 @@ class Transifex:
             # Transform "c-api--abstract" and "c-api--allocation" into "c-api".
             # resource = resource.split('--')[0]
 
-            for field in fields:
+            for field in STATS_FIELDS:
                 stats[resource][field] += stat[field]
 
         stats["glossary"] = stats.pop("glossary_")
         return {key: stats[key] for key in sorted(stats.keys(), reverse=True)}
 
 
-async def daily_stats(output):
-    logger.info("running daily stats")
+async def download_current_stats(output):
+    """
+    Download statistics from every resource present at Transifex and
+    save it as JSON files at `output`.
+    """
+    logger.info("Downloading current statistics")
     async with aiohttp.ClientSession(
         auth=aiohttp.BasicAuth("api", Transifex.api_token)
     ) as session:
@@ -85,14 +89,14 @@ async def daily_stats(output):
     filename = output / f"{today}.json"
 
     with open(filename, mode="w") as file:
-        logger.info("saving stats at {}", filename)
+        logger.info("Saving stats at {}", filename)
         file.write(json.dumps(stats))
 
 
 def run_daily_stats():
     output = Path(config("OUTPUT_DATA"))
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(daily_stats(output))
+    loop.run_until_complete(download_current_stats(output))
 
 
 def select_report_files(output):
@@ -186,6 +190,7 @@ async def report():
 
 
 def main():
+    run_daily_stats()
     schedule.every().sunday.at("18:00").do(asyncio.run(report()))
     schedule.every().day.at("23:59").do(run_daily_stats).run()
     while True:
