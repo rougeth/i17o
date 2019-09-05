@@ -120,6 +120,8 @@ def serialize_report(report, group_resources=False):
             resource = resource.split("--")[0]
 
         for field in stats:
+            if field not in STATS_FIELDS:
+                continue
             updated_report[resource][field] += stats[field]
 
     if updated_report.get("glossary_"):
@@ -138,6 +140,8 @@ def compare_reports():
     report = defaultdict(dict)
     for resource, stats in latest_report.items():
         for stat, value in stats.items():
+            if stat not in STATS_FIELDS:
+                continue
             previous_value = previous_report[resource][stat]
             if value != previous_value:
                 report[resource][stat] = value - previous_value
@@ -184,8 +188,7 @@ async def report():
 
 
 def main():
-    run_daily_stats()
-    schedule.every().sunday.at("18:00").do(asyncio.run(report()))
+    schedule.every().sunday.at("18:00").do(asyncio.run, report())
     schedule.every().day.at("23:59").do(run_daily_stats).run()
     while True:
         schedule.run_pending()
