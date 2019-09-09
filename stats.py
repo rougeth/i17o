@@ -177,6 +177,8 @@ async def report():
             if not stat_message:
                 continue
             message += stat_message.format(value)
+    else:
+        message += "Nenhuma atualização nos últimos dias"
 
     users = config(
         "BROADCAST_REPORT_TO", cast=lambda v: [s.strip() for s in v.split(",")]
