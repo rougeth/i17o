@@ -1,0 +1,16 @@
+name: Download daily stats
+on:
+  schedule:
+    - cron: '0 23 * * *'
+jobs:
+  download:
+    runs-on: ubuntu:latest
+    steps:
+      - name: Install Poetry
+        run: python -m pip install poetry
+      - name: Install dependencies
+        run: |
+            python -m poetry config settings.virtualenvs.create false
+            python -m poetry install --no-dev --no-interaction
+      - name: Download statistics from Transifex
+        run : python -m i17obot-data download-stats ./data/languages/pt-br
