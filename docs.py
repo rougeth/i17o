@@ -133,9 +133,7 @@ def serialize_report(report, group_resources=False):
 def compare_reports():
     output = Path(config("OUTPUT_DATA"))
     reports = select_report_files(output)
-    latest_report, previous_report = map(
-        lambda r: serialize_report(r, group_resources=True), reports
-    )
+    latest_report, previous_report = map(lambda r: serialize_report(r=True), reports)
 
     report = defaultdict(dict)
     for resource, stats in latest_report.items():
@@ -190,6 +188,10 @@ async def report():
 
 
 def main():
+    report_on_start = config("REPORT_ON_START", cast=bool, default=False)
+    if report_on_start:
+        asyncio.run(report())
+
     schedule.every().sunday.at("18:00").do(asyncio.run, report())
     schedule.every().day.at("23:59").do(run_daily_stats).run()
     while True:
