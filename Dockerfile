@@ -1,10 +1,10 @@
-FROM python:alpine
+FROM python:slim
 
-RUN pip install --no-cache-dir poetry
+RUN apt update && apt install -y --no-install-recommends gcc
 
-COPY pyproject.toml poetry.lock ./
-RUN poetry config settings.virtualenvs.create false
-RUN poetry install --no-dev --no-interaction
+RUN pip install --no-cache-dir pipenv
+COPY Pipfile Pipfile.lock ./
+RUN pipenv install --system --deploy
 
 COPY . .
-CMD [ "poetry" "run" "python", "./stats.py" ]
+CMD [ "python", "./stats.py" ]
